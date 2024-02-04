@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+  }
+  #thumbnailContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  #buttonContainer {
+    margin-top: 10px;
+    z-index: 100;
+    position: relative;
+  }
+  #imageContainers {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .imageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+    margin: 10px;
+    margin-top: 100px; /* Adjust this value as needed */
+    position: relative;
+    width: 300px; 
+    height: 300px; 
+}
+  .imageContainer img {
+    max-width: 100%; 
+    max-height: 100%; 
+    position: absolute;
+  }
+  .imageContainer .background {
+    z-index: 1; 
+  }
+  .imageContainer .foreground {
+    z-index: 2; 
+    filter: grayscale(100%); 
+  }
+  #rightImageContainer {
+    margin-left: -240px; /* Adjust this value as needed */
+  }
+  #leftImageContainer {
+    margin-right: -60px; /* Adjust this value as needed */
+  }
+  #centerImageContainer img {
+    position: relative; 
+    margin-top: 315px;
+    z-index: 3; /* Adjust this value as needed */
+    height: 300px; /* Adjust this value as needed */
+  }
+  .uploadButton {
+    margin-top: 20px;
+  }
+  #controlsLeft {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 50%; 
+    text-align: center;
+    background: #fff; 
+    padding: 10px 0;
+  }
+  #controlsRight {
+    position: fixed;
+    right: 20%;
+    bottom: 0;
+    width: 50%; 
+    text-align: center;
+    background: #fff; 
+    padding: 10px 0;
+  }
+
+</style>
+</head>
+<body>
+  <div id="buttonContainer">
+    <input type="file" class="uploadButton" id="uploadButtonLeftBackground" accept="image/*">
+    <input type="file" class="uploadButton" id="uploadButtonLeftForeground" accept="image/*">
+    <input type="file" class="uploadButton" id="uploadButtonCenter" accept="image/*">
+    <input type="file" class="uploadButton" id="uploadButtonRightBackground" accept="image/*">
+    <input type="file" class="uploadButton" id="uploadButtonRightForeground" accept="image/*">
+  </div>
+  
+  <div id="imageContainers">
+    <div id="leftImageContainer" class="imageContainer">
+      <div id="leftBackgroundContainer"></div>
+      <div id="leftForegroundContainer"></div>
+    </div>
+    
+    <div id="centerImageContainer" class="imageContainer">
+      <div id="centerBackgroundContainer"></div>
+    </div>
+    
+    <div id="rightImageContainer" class="imageContainer">
+      <div id="rightBackgroundContainer"></div>
+      <div id="rightForegroundContainer"></div>
+    </div>
+  </div>
+
+  <div id="controlsLeft" class="sliderContainer">
+    <input type="range" class="opacitySlider" id="opacitySliderLeft" min="0" max="100" value="100">
+  </div>
+  <div id="controlsRight" class="sliderContainer">
+    <input type="range" class="opacitySlider" id="opacitySliderRight" min="0" max="100" value="100">
+  </div>
+
+  <script>
+function uploadImage(event, backgroundContainerId, foregroundContainerId, isForeground) {
+  var file = event.target.files[0];
+  var img = document.createElement('img'); 
+  img.src = URL.createObjectURL(file); 
+  img.onload = function() {
+    URL.revokeObjectURL(img.src); 
+  }
+  img.className = isForeground ? 'foreground' : 'background'; 
+  var containerId = isForeground ? foregroundContainerId : backgroundContainerId;
+  document.getElementById(containerId).appendChild(img); 
+}
+document.getElementById('uploadButtonLeftBackground').addEventListener('change', function(event) {
+  uploadImage(event, 'leftBackgroundContainer', 'leftForegroundContainer', false);
+});
+document.getElementById('uploadButtonLeftForeground').addEventListener('change', function(event) {
+  uploadImage(event, 'leftBackgroundContainer', 'leftForegroundContainer', true);
+});
+
+document.getElementById('uploadButtonCenter').addEventListener('change', function(event) {
+  uploadImage(event, 'centerBackgroundContainer', 'centerForegroundContainer', false);
+});
+
+document.getElementById('uploadButtonRightBackground').addEventListener('change', function(event) {
+  uploadImage(event, 'rightBackgroundContainer', 'rightForegroundContainer', false);
+});
+document.getElementById('uploadButtonRightForeground').addEventListener('change', function(event) {
+  uploadImage(event, 'rightBackgroundContainer', 'rightForegroundContainer', true);
+});
+document.getElementById('opacitySliderLeft').addEventListener('input', function() {
+  const imageContainer = document.getElementById('leftForegroundContainer');
+  const foregroundImage = imageContainer.querySelector('.foreground');
+  if (foregroundImage) {
+    foregroundImage.style.filter = `brightness(${this.value}%)`; 
+  }
+});
+document.getElementById('opacitySliderRight').addEventListener('input', function() {
+  const imageContainer = document.getElementById('rightForegroundContainer');
+  const foregroundImage = imageContainer.querySelector('.foreground');
+  if (foregroundImage) {
+    foregroundImage.style.filter = `brightness(${this.value}%)`; 
+  }
+});
+  </script>
+</body>
+</html>
